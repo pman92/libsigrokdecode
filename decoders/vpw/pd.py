@@ -39,7 +39,7 @@ def normalize_time(t):
         return '%f' % t
 
 class Decoder(srd.Decoder):
-    api_version = 2
+    api_version = 3
     id = 'vpw'
     name = 'VPW'
     longname = 'J1850 VPW Decoder'
@@ -129,11 +129,12 @@ class Decoder(srd.Decoder):
     def start(self):
         self.out_ann = self.register(srd.OUTPUT_ANN)
 
-    def decode(self, ss, es, data):
+    def decode(self):
         if not self.samplerate:
             raise SamplerateError('Cannot decode without samplerate.')
 
-        for (self.samplenum, (pin,)) in data:
+        while True:
+            pin = self.wait({0: 'e'})
             # Ignore identical samples early on (for performance reasons).
             if self.oldpin == pin:
                 continue
